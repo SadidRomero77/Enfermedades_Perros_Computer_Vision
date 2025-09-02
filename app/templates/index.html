@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detector de Enfermedades Caninas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Detector de Enfermedades Caninas 🐶</h1>
+
+        <div class="upload-section">
+            <input type="file" id="imageInput" accept="image/*">
+            <button onclick="uploadImage()">Predecir Imagen</button>
+            <button onclick="clearImage()">Limpiar</button>
+        </div>
+
+        <div class="camera-section">
+            <button onclick="startCamera()">Activar Cámara</button>
+            <button onclick="stopCamera()">Detener Cámara</button>
+        </div>
+
+        <div class="preview">
+            <img id="previewImage" src="" alt="Imagen con predicción">
+            <img id="cameraFeed" src="" alt="Feed de cámara">
+        </div>
+    </div>
+
+    <script>
+        function uploadImage() {
+            const input = document.getElementById('imageInput');
+            const file = input.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/predict-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.blob())
+            .then(blob => {
+                document.getElementById('previewImage').src = URL.createObjectURL(blob);
+                document.getElementById('previewImage').style.display = 'block';
+            });
+        }
+
+        function clearImage() {
+            document.getElementById('previewImage').src = '';
+            document.getElementById('previewImage').style.display = 'none';
+        }
+
+        function startCamera() {
+            fetch('/start-camera')
+                .then(() => {
+                    document.getElementById('cameraFeed').style.display = 'block';
+                    updateCameraFeed();
+                });
+        }
+
+        function stopCamera() {
+            fetch('/stop-camera')
+                .then(() => {
+                    document.getElementById('cameraFeed').src = '';
+                    document.getElementById('cameraFeed').style.display = 'none';
+                });
+        }
+
+        function updateCameraFeed() {
+            fetch('/camera-feed')
+                .then(res => res.blob())
+                .then(blob => {
+                    document.getElementById('cameraFeed').src = URL.createObjectURL(blob);
+                });
+
+            setTimeout(updateCameraFeed, 1000);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# Ignorar entorno virtual y binarios pesados
+venv/
+*.dll
+*.lib
+*.pyd
+*.so
+*.dylib
+*.pt
+*.onnx
+__pycache__/
+*.pyc
+*.ipynb_checkpoints/
+*.log
+*.db
+*.sqlite3
